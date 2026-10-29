@@ -1,0 +1,75 @@
+.container {
+  max-width: 480px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.search-form button,
+.result button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #5a3e2b;
+  color: white;
+  cursor: pointer;
+}
+
+.search-form button:disabled,
+.result button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error {
+  color: #c0392b;
+}
+
+.result {
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.result.good {
+  background: #e8f5e9;
+}
+
+.result.bad {
+  background: #fdecea;
+}
+
+.verdict {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.details,
+.reasons {
+  padding-left: 1.2rem;
+}
+
+.result button {
+  margin-top: 1rem;
+}

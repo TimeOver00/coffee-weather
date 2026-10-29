@@ -1,5 +1,12 @@
 RAINY_CONDITIONS = {"Rain", "Drizzle", "Thunderstorm", "Snow"}
 
+CONDITION_LABELS_FR = {
+    "Rain": "de la pluie",
+    "Drizzle": "de la bruine",
+    "Thunderstorm": "un orage",
+    "Snow": "de la neige",
+}
+
 MIN_GOOD_TEMP = 15.0
 MAX_GOOD_TEMP = 28.0
 MAX_GOOD_WIND_SPEED = 5.5  # m/s, ~20 km/h
@@ -9,7 +16,8 @@ def evaluate_coffee_day(temp: float, condition: str, wind_speed: float) -> tuple
     reasons = []
 
     if condition in RAINY_CONDITIONS:
-        reasons.append(f"Il y a du {condition.lower()}, pas idéal pour une terrasse.")
+        label = CONDITION_LABELS_FR[condition]
+        reasons.append(f"Il y a {label}, pas idéal pour une terrasse.")
 
     if temp < MIN_GOOD_TEMP:
         reasons.append(f"Il fait {temp:.1f}°C, un peu frais pour s'installer dehors.")

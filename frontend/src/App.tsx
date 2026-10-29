@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import WeatherBackground from './WeatherBackground'
+import { getWeatherCategory, THEME_GRADIENTS } from './weatherTheme'
 import './App.css'
 
 const API_URL = 'http://localhost:8000'
@@ -20,6 +23,8 @@ function App() {
   const [result, setResult] = useState<WeatherResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const category = getWeatherCategory(result?.condition ?? null)
 
   async function checkWeather() {
     if (!city.trim()) return
@@ -52,48 +57,128 @@ function App() {
   }
 
   return (
-    <main className="container">
-      <h1>☕ Coffee Weather</h1>
-      <p className="subtitle">Est-ce un bon jour pour un café en terrasse ?</p>
+    <div className="page">
+      <div className="page-bg">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={category}
+            className="bg-layer"
+            style={{ background: THEME_GRADIENTS[category] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          />
+        </AnimatePresence>
+      </div>
+      <WeatherBackground category={category} />
 
-      <form onSubmit={handleSubmit} className="search-form">
-        <input
-          type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="Entre une ville (ex: Montreal)"
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Vérification...' : 'Vérifier'}
-        </button>
-      </form>
+      <main className="container">
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          ☕ Coffee Weather
+        </motion.h1>
+        <motion.p
+          className="subtitle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          Est-ce un bon jour pour un café en terrasse ?
+        </motion.p>
 
-      {error && <p className="error">{error}</p>}
+        <motion.form
+          onSubmit={handleSubmit}
+          className="search-form"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Entre une ville (ex: Montreal)"
+          />
+          <motion.button
+            type="submit"
+            disabled={loading}
+            whileHover={{ scale: loading ? 1 : 1.05 }}
+            whileTap={{ scale: loading ? 1 : 0.95 }}
+          >
+            {loading ? (
+              <motion.span
+                className="spinner"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+              />
+            ) : (
+              'Vérifier'
+            )}
+          </motion.button>
+        </motion.form>
 
-      {result && (
-        <section className={`result ${result.good_day ? 'good' : 'bad'}`}>
-          <h2>
-            {result.city}, {result.country}
-          </h2>
-          <p className="verdict">
-            {result.good_day ? '✅ Oui, sors ton café !' : '❌ Reste au chaud à l\'intérieur.'}
-          </p>
-          <ul className="details">
-            <li>Température : {result.temp.toFixed(1)}°C (ressenti {result.feels_like.toFixed(1)}°C)</li>
-            <li>Conditions : {result.description}</li>
-            <li>Vent : {result.wind_speed.toFixed(1)} m/s</li>
-          </ul>
-          <ul className="reasons">
-            {result.reasons.map((reason) => (
-              <li key={reason}>{reason}</li>
-            ))}
-          </ul>
-          <button type="button" onClick={checkWeather} disabled={loading}>
-            Rafraîchir
-          </button>
-        </section>
-      )}
-    </main>
+        <AnimatePresence>
+          {error && (
+            <motion.p
+              className="error"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              {error}
+            </motion.p>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {result && (
+            <motion.section
+              key={`${result.city}-${result.temp}`}
+              className={`result ${result.good_day ? 'good' : 'bad'}`}
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.97 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
+              <h2>
+                {result.city}, {result.country}
+              </h2>
+              <motion.p
+                className="verdict"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
+              >
+                {result.good_day ? '✅ Oui, sors ton café !' : "❌ Reste au chaud à l'intérieur."}
+              </motion.p>
+              <ul className="details">
+                <li>Température : {result.temp.toFixed(1)}°C (ressenti {result.feels_like.toFixed(1)}°C)</li>
+                <li>Conditions : {result.description}</li>
+                <li>Vent : {result.wind_speed.toFixed(1)} m/s</li>
+              </ul>
+              <ul className="reasons">
+                {result.reasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+              <motion.button
+                type="button"
+                onClick={checkWeather}
+                disabled={loading}
+                whileHover={{ scale: loading ? 1 : 1.05 }}
+                whileTap={{ scale: loading ? 1 : 0.95 }}
+              >
+                Rafraîchir
+              </motion.button>
+            </motion.section>
+          )}
+        </AnimatePresence>
+      </main>
+    </div>
   )
 }
 

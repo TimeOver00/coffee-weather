@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import AuroraBackground from './AuroraBackground'
 import WeatherBackground from './WeatherBackground'
-import { getWeatherCategory, THEME_GRADIENTS } from './weatherTheme'
+import AnimatedNumber from './AnimatedNumber'
+import { getWeatherCategory, getTheme } from './weatherTheme'
 import './App.css'
 
 const API_URL = 'http://localhost:8000'
@@ -14,6 +16,7 @@ interface WeatherResult {
   condition: string
   description: string
   wind_speed: number
+  is_day: boolean
   good_day: boolean
   reasons: string[]
 }
@@ -25,6 +28,8 @@ function App() {
   const [error, setError] = useState<string | null>(null)
 
   const category = getWeatherCategory(result?.condition ?? null)
+  const isDay = result?.is_day ?? true
+  const theme = getTheme(category, isDay)
 
   async function checkWeather() {
     if (!city.trim()) return
@@ -58,20 +63,8 @@ function App() {
 
   return (
     <div className="page">
-      <div className="page-bg">
-        <AnimatePresence mode="sync">
-          <motion.div
-            key={category}
-            className="bg-layer"
-            style={{ background: THEME_GRADIENTS[category] }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-          />
-        </AnimatePresence>
-      </div>
-      <WeatherBackground category={category} />
+      <AuroraBackground theme={theme} />
+      <WeatherBackground category={category} isDay={isDay} />
 
       <main className="container">
         <motion.h1
@@ -149,14 +142,21 @@ function App() {
               </h2>
               <motion.p
                 className="verdict"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
+                initial={{ scale: 0.7, rotate: -4 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 14, delay: 0.1 }}
               >
                 {result.good_day ? '✅ Oui, sors ton café !' : "❌ Reste au chaud à l'intérieur."}
               </motion.p>
+              <div className="temp-row">
+                <span className="temp-big">
+                  <AnimatedNumber value={result.temp} />°C
+                </span>
+                <span className="temp-feel">
+                  ressenti <AnimatedNumber value={result.feels_like} />°C
+                </span>
+              </div>
               <ul className="details">
-                <li>Température : {result.temp.toFixed(1)}°C (ressenti {result.feels_like.toFixed(1)}°C)</li>
                 <li>Conditions : {result.description}</li>
                 <li>Vent : {result.wind_speed.toFixed(1)} m/s</li>
               </ul>

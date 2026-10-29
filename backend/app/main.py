@@ -26,6 +26,7 @@ class CoffeeWeatherResponse(BaseModel):
     condition: str
     description: str
     wind_speed: float
+    is_day: bool
     good_day: bool
     reasons: list[str]
 
@@ -55,6 +56,7 @@ async def get_weather(city: str) -> CoffeeWeatherResponse:
 
     data = response.json()
     condition = data["weather"][0]["main"]
+    is_day = data["weather"][0]["icon"].endswith("d")
     good_day, reasons = evaluate_coffee_day(
         temp=data["main"]["temp"],
         condition=condition,
@@ -69,6 +71,7 @@ async def get_weather(city: str) -> CoffeeWeatherResponse:
         condition=condition,
         description=data["weather"][0]["description"],
         wind_speed=data["wind"]["speed"],
+        is_day=is_day,
         good_day=good_day,
         reasons=reasons,
     )

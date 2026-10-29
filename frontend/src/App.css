@@ -50,6 +50,11 @@
   padding: 1.5rem;
   border-radius: 10px;
   text-align: left;
+  color: #1a1a1a;
+}
+
+.result h2 {
+  color: #1a1a1a;
 }
 
 .result.good {
